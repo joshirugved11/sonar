@@ -1,0 +1,15 @@
+google-generativeai
+openai
+SpeechRecognition
+pyttsx3
+pyaudio
+whisper
+torchaudio
+websockets
+fastapi
+python-socketio
+requests
+elevenlabs
+rich
+termcolor
+numpy
