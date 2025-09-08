@@ -1,17 +1,9 @@
-google-generativeai                          # Gemini API
-openai                                       # Optional: OpenAI GPT fallback
-SpeechRecognition                            # online, Google STT wrapper
-pyttsx3                                      # offline, cross platform
-gTTS                                         # Google TTS (simple, online)
-pyaudio                                      # online, Microphone input
-whisper                                      # OpenAI Whisper (offline)
-torchaudio                                   # For audio handling (offline)
-websockets
-fastapi
-python-socketio
+python-dotenv
+speechrecognition
+pyaudio            # on Linux you may need system deps: portaudio
+google-generativeai
 requests
-elevenlabs
-rich
-termcolor
-numpy
-playsound
+pyttsx3
+playsound==1.2.2   # for playing TTS fallback files
+whisper            # optional if you want offline whisper (requires torch)
+torchaudio         # if using whisper
