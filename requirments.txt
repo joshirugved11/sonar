@@ -7,5 +7,6 @@ pyttsx3
 playsound==1.2.2   # for playing TTS fallback files
 whisper            # optional if you want offline whisper (requires torch)
 torchaudio         # if using whisper
-pvporcupine        # for wake word detection
 elevenlabs
+sounddevice
+vosk
