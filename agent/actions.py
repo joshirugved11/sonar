@@ -37,11 +37,6 @@ def open_application(app_name: str):
         return True
 
 def call_number_or_contact(contact: str):
-    """
-    Best effort: open tel: link or open web-based apps.
-    On desktop open default handler (Skype / Teams / Zoom) if registered.
-    Alternatively open WhatsApp web chat for phone numbers.
-    """
     contact = contact.strip()
     # if phone digits:
     if re.fullmatch(r"[\d\+\- ]+", contact):
@@ -52,11 +47,6 @@ def call_number_or_contact(contact: str):
     return False
 
 def perform_action_from_intent(action: str, target: str, extra: dict = None) -> Tuple[bool, str]:
-    """
-    action: open_app/open_url/call/none
-    target: string target
-    returns (success, message)
-    """
     try:
         if action == "open_app":
             open_application(target)
@@ -64,9 +54,9 @@ def perform_action_from_intent(action: str, target: str, extra: dict = None) -> 
         if action == "open_url":
             open_url(target)
             return True, f"Opening URL {target}"
-        '''if action == "call":
+        if action == "call":
             ok = call_number_or_contact(target)
-            return ok, "Calling..." if ok else "Could not place call"'''
+            return ok, "Calling..." if ok else "Could not place call"
         return False, "No action"
     except Exception as e:
         return False, f"Action error: {e}"
