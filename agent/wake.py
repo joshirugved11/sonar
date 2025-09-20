@@ -17,7 +17,7 @@ recognizer = KaldiRecognizer(model, 16000)
 recognizer.SetWords(True)
 
 q = queue.Queue()
-vad = webrtcvad.Vad(2)  # Aggressiveness: 0-3
+vad = webrtcvad.Vad(2)  
 
 def is_speech(frame_bytes):
     """Check if the audio frame contains speech using VAD."""
@@ -36,20 +36,15 @@ def listen_for_wakeword(wakewords=None):
             print(f"⚠️ Microphone status: {status}", flush=True)
         q.put(bytes(indata))
 
-    print("🎤 Starting microphone...", flush=True)
-
     try:
         with sd.RawInputStream(samplerate=16000, blocksize=8000, dtype='int16',
                                channels=1, callback=callback):
-            print("✅ Microphone stream opened successfully.", flush=True)
             print(f"🎧 Listening for wake word... (say one of: {', '.join(wakewords)})", flush=True)
 
             while True:
                 data = q.get()
-                print(f"📥 Received {len(data)} bytes of audio", flush=True)  # DEBUG
 
                 if not is_speech(data):
-                    # print("❌ No speech detected (silent frame)", flush=True)  # uncomment for more noise debug
                     continue
 
                 if recognizer.AcceptWaveform(data):
