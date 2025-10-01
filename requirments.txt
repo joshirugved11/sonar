@@ -1,5 +1,4 @@
 python-dotenv
-speechrecognition
 pyaudio            # on Linux you may need system deps: portaudio
 google-generativeai
 requests
@@ -7,6 +6,11 @@ pyttsx3
 playsound==1.2.2   # for playing TTS fallback files
 whisper            # optional if you want offline whisper (requires torch)
 torchaudio         # if using whisper
-elevenlabs
 sounddevice
 vosk
+deepgram-sdk
+openai-whisper
+numpy
+TTS
+simpleaudio
+webrtcvad
