@@ -2,31 +2,55 @@ import os
 import sounddevice as sd
 import queue
 import json
-import webrtcvad
+import numpy as np
 from vosk import Model, KaldiRecognizer
 
-# ✅ Use correct absolute model path
-model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../vosk-model-small-en-us-0.15"))
+# Optional: Choose VAD engine
+USE_SILERO = True   # True = Silero VAD, False = WebRTC VAD
 
+# ------------------- Load VAD -------------------
+if USE_SILERO:
+    import torch
+    silero_model, utils = torch.hub.load(
+        "snakers4/silero-vad",
+        "silero_vad",
+        force_reload=False,
+        onnx=False,
+        trust_repo=True
+    )
+    get_speech_timestamps, _, read_audio, VADIterator, collect_chunks = utils
+
+    def is_speech(frame_bytes, sample_rate=16000):
+        # Convert raw frame to torch tensor
+        audio_np = np.frombuffer(frame_bytes, np.int16).astype(np.float32) / 32768.0
+        audio_tensor = torch.from_numpy(audio_np).unsqueeze(0)
+        speech_prob = silero_model(audio_tensor, sample_rate).item()
+        return speech_prob > 0.5  # threshold
+
+else:
+    import webrtcvad
+    vad = webrtcvad.Vad(2)  # Aggressiveness 0–3
+
+    def is_speech(frame_bytes, sample_rate=16000):
+        return vad.is_speech(frame_bytes, sample_rate)
+
+# ------------------- Load Vosk -------------------
+model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../vosk-model-small-en-us-0.15"))
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"❌ Vosk model not found at {model_path}. Please download & extract it correctly.")
 
 print(f"✅ Loading Vosk model from: {model_path}", flush=True)
-model = Model(model_path)
-recognizer = KaldiRecognizer(model, 16000)
+vosk_model = Model(model_path)
+recognizer = KaldiRecognizer(vosk_model, 16000)
 recognizer.SetWords(True)
 
+# ------------------- Audio Capture -------------------
 q = queue.Queue()
-vad = webrtcvad.Vad(2)  
-
-def is_speech(frame_bytes):
-    """Check if the audio frame contains speech using VAD."""
-    return vad.is_speech(frame_bytes, 16000)
 
 def listen_for_wakeword(wakewords=None):
     """
     Opens the microphone, confirms it's running, THEN starts listening for wakeword.
-    Prints debug info for every step.
+    Supports both WebRTC VAD and Silero VAD.
     """
     if wakewords is None:
         wakewords = ["hi sonar", "hello sonar"]
@@ -44,7 +68,7 @@ def listen_for_wakeword(wakewords=None):
             while True:
                 data = q.get()
 
-                if not is_speech(data):
+                if not is_speech(data, 16000):
                     continue
 
                 if recognizer.AcceptWaveform(data):
@@ -61,3 +85,7 @@ def listen_for_wakeword(wakewords=None):
     except Exception as e:
         print(f"❌ Failed to open microphone or process audio: {e}", flush=True)
         return False
+
+
+if __name__ == "__main__":
+    listen_for_wakeword()
