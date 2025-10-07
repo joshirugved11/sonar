@@ -28,7 +28,7 @@ Say **“Hi Sonar”** to wake it up, speak your command, and Sonar will:
 
 python -m venv venv
 
-source venv/bin/activate   # Windows: venv\Scripts\activate
+source venv/bin/activate   `# Windows: venv\Scripts\activate`
 
 pip install -r requirements.txt
 
@@ -69,17 +69,27 @@ npm run tauri dev
 📐 **Architecture Overview**
 
 flowchart LR
+
     A[🎤 Mic Input] --> B[STT (ElevenLabs / Whisper)]
+    
     B --> C[🧠 Gemini AI]
+    
     C --> D[Intent Detection]
+    
     D --> E[⚡ Actions (Open App/URL)]
+    
     C --> F[TTS (ElevenLabs / pyttsx3)]
+    
     F --> G[🔊 Speaker Output]
     subgraph Tauri UI
+    
         H[Frontend: React + Bootstrap]
     end
+    
     H <-->|REST / WebSocket| B
+    
     H <-->|REST / WebSocket| C
+    
     H <-->|REST / WebSocket| F
 
 ---
