@@ -83,7 +83,7 @@ flowchart LR
     F --> G[🔊 Speaker Output]
     subgraph Tauri UI
     
-        H[Frontend: React + Bootstrap]
+    H[Frontend: React + Bootstrap]
     end
     
     H <-->|REST / WebSocket| B
